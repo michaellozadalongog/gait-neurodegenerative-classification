@@ -1,0 +1,18 @@
+# Data files (download with src/01_download_data.py instead)
+data/gaitndd/
+data/features.csv
+data/results.csv
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# Editors
+.vscode/
+.idea/
