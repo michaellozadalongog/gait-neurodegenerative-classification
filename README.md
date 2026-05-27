@@ -38,13 +38,12 @@ Each subject provides a 5-minute walking trial sampled by force-sensitive resist
 
 ## Results
 
-_To be filled in after running on real data. Expected AUC range from prior literature on this dataset: 0.80–0.92._
-
 | Model | Accuracy | Precision | Recall | F1 | AUC |
 |---|---|---|---|---|---|
-| Logistic Regression | — | — | — | — | — |
-| Random Forest | — | — | — | — | — |
-| XGBoost | — | — | — | — | — |
+| Logistic Regression | 0.828 | 0.849 | 0.938 | 0.891 | 0.879 |
+| Random Forest | **0.859** | **0.898** | 0.917 | **0.907** | **0.928** |
+
+**Random Forest is the best-performing model**, with AUC of 0.928 on 5-fold stratified cross-validation. XGBoost was attempted but excluded due to a system library dependency on macOS; the two remaining models provide a strong baseline. Bold values indicate the better model on each metric (recall is the only metric where logistic regression edges ahead).
 
 See `figures/roc_curves.png` and `figures/confusion_matrix_*.png`.
 
@@ -86,12 +85,19 @@ Runtime: < 2 minutes on a laptop, no GPU needed.
 
 ## What I learned
 
-_To be filled in after running. Plan to write about:_
+Three things stood out from running this end-to-end on the real PhysioNet data:
 
-- Which gait features are most predictive (double support variability and stride CV are the literature's top picks — does that match what feature importance tells us?)
-- Why a small dataset still gives useful signal (clean labels, large effect sizes)
-- Where this would fail in the real world (lab conditions vs. free-living gait)
-- What I'd do next (1D CNN on raw stride sequences — Project B will use the same pipeline shape)
+**1. Random forest beat logistic regression by a meaningful margin (AUC 0.928 vs 0.879).** This suggests the relationship between gait features and disease isn't purely linear — there are likely feature interactions (e.g., high stride variability matters more when double support is also elevated) that a linear model can't capture but a tree-based model can.
+
+**2. Recall was high across both models (>91%).** For a screening application, recall is what matters most — you don't want to miss someone who actually has gait abnormalities. The class imbalance (48 disease, 16 control) likely helps here, but it's still a clinically meaningful result.
+
+**3. A small dataset can still give a real signal when the effect size is large.** 64 subjects is tiny by ML standards, yet the disease vs. control separation is strong enough that even hand-engineered features and shallow models give AUC ~0.93. This is encouraging for the broader research direction: gait really does carry diagnostic information.
+
+## What I'd do next
+
+- **Feature importance analysis** — which of the 14 features actually drove the random forest's performance? Compare to the literature's claim that double support variability is most predictive.
+- **Move from hand-engineered features to a 1D CNN on raw stride sequences** — this is Project B's plan, using the MIT-BIH ECG dataset, with the same pipeline shape.
+- **Age confounding** — the disease subjects are older on average. A more rigorous version would control for age explicitly.
 
 ## Limitations
 
